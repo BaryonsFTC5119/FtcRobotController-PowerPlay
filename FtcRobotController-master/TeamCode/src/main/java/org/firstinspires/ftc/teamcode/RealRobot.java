@@ -57,6 +57,7 @@ public class RealRobot {
     //, carousel;
 
     //public final Servo lchain, rchain, lclaw, rclaw;
+    public final Servo lchain;
 
 
 
@@ -126,6 +127,7 @@ public class RealRobot {
         //rtrolley = hardwareMap.dcMotor.get("rtrolley");
         //carousel = hardwareMap.dcMotor.get("carousel");
 
+        lchain = hardwareMap.servo.get("lchain");
         /*lclaw = hardwareMap.servo.get("lclaw");
         rclaw = hardwareMap.servo.get("rclaw");
         lchain = hardwareMap.servo.get("lchain");

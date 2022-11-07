@@ -170,7 +170,7 @@ public class MaybeMecanum extends OpMode
             rr*=.7;
         }
 
-        if(controller.leftBumperOnce()) {
+        /*if(controller.leftBumperOnce()) {
             robot.runUsingEncoders();
             robot.encoderDrive(.06,24.7,'B');
             robot.runWithoutEncoders();
@@ -179,7 +179,9 @@ public class MaybeMecanum extends OpMode
             robot.runUsingEncoders();
             robot.encoderDrive(.08,25,'F');
             robot.runWithoutEncoders();
-        }
+        }*/
+
+
 
 
         robot.setMotors(-lf, lr, rf, -rr);
@@ -192,6 +194,8 @@ public class MaybeMecanum extends OpMode
         telemetry.addData("1 Left Joystick X", controller.left_stick_x);
         telemetry.addData("2 Left Joystick Y", controller2.left_stick_y);
         telemetry.addData("2 Left Joystick X", controller2.left_stick_x);
+        telemetry.addData("L Chain Position: ", robot.lchain.getPosition());
+
 //        telemetry.addData("Lift target position", robot.lift.getTargetPosition());
 //        telemetry.addData("Carriage Position", robot.carriage.getPosition());
 //        telemetry.addData("Height check 1: ", (heightCheck ? "True" : "False"));
