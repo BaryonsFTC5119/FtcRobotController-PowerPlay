@@ -73,7 +73,7 @@ public class JoystickServo extends OpMode{
         }
 
         if(controller.dpaddownOnce()&&lchain.getPosition()!=0){
-            lchain.setPosition(lchain.getPosition()-0.05)
+            lchain.setPosition(lchain.getPosition()-0.05);
         }
 
         telemetry.addData("L chain position: " + lchain.getPosition());
