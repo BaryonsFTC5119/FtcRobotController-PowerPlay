@@ -178,6 +178,14 @@ public class MaybeMecanum extends OpMode
             robot.lchain.setPosition(robot.lchain.getPosition()-0.05);
         }
 
+        if(controller.leftBumperOnce()){
+            robot.lchain.setDirection(FORWARD);
+        }
+
+        if(controller.rightBumperOnce()){
+            robot.lchain.setDirection(REVERSE);
+        }
+
         /*if(controller.leftBumperOnce()) {
             robot.runUsingEncoders();
             robot.encoderDrive(.06,24.7,'B');
@@ -203,6 +211,7 @@ public class MaybeMecanum extends OpMode
         telemetry.addData("2 Left Joystick Y", controller2.left_stick_y);
         telemetry.addData("2 Left Joystick X", controller2.left_stick_x);
         telemetry.addData("L Chain Position: ", robot.lchain.getPosition());
+        telemetry.addData("Current servo direction: " + robot.lchain.getDirection());
 
 //        telemetry.addData("Lift target position", robot.lift.getTargetPosition());
 //        telemetry.addData("Carriage Position", robot.carriage.getPosition());
