@@ -211,7 +211,7 @@ public class MaybeMecanum extends OpMode
         telemetry.addData("2 Left Joystick Y", controller2.left_stick_y);
         telemetry.addData("2 Left Joystick X", controller2.left_stick_x);
         telemetry.addData("L Chain Position: ", robot.lchain.getPosition());
-        telemetry.addData("Current servo direction: " + robot.lchain.getDirection());
+        telemetry.addData("Current servo direction: ",  robot.lchain.getDirection());
 
 //        telemetry.addData("Lift target position", robot.lift.getTargetPosition());
 //        telemetry.addData("Carriage Position", robot.carriage.getPosition());
