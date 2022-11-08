@@ -170,11 +170,11 @@ public class MaybeMecanum extends OpMode
             rr*=.7;
         }
 
-        if(controller.dpadUpOnce()&&robot.lchain.getPosition()<1){
+        if(controller.dpadUpOnce()&&robot.lchain.getPosition()){
             robot.lchain.setPosition(robot.lchain.getPosition()+0.05);
         }
 
-        if(controller.dpadDownOnce()&&robot.lchain.getPosition()!=0){
+        if(controller.dpadDownOnce()&&robot.lchain.getPosition()){
             robot.lchain.setPosition(robot.lchain.getPosition()-0.05);
         }
 
