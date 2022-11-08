@@ -179,11 +179,11 @@ public class MaybeMecanum extends OpMode
         }
 
         if(controller.leftBumperOnce()){
-            robot.lchain.setDirection(FORWARD);
+            robot.lchain.setDirection(Servo.Direction.FORWARD);
         }
 
         if(controller.rightBumperOnce()){
-            robot.lchain.setDirection(REVERSE);
+            robot.lchain.setDirection(Servo.Direction.REVERSE);
         }
 
         /*if(controller.leftBumperOnce()) {
