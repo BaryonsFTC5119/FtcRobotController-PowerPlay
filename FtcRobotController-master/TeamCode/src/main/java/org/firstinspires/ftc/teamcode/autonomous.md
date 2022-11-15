@@ -33,7 +33,7 @@
 <br /> 
 ~5-10 sec remaining
 
-- end loop in parking square 2
+- end loop in parking square 2 (this means 23.5 inches fwd)
 
 - move to correct parking position (if not already there)
 
