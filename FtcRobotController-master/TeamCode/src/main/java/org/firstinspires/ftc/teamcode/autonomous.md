@@ -11,6 +11,7 @@ turn right 90 degrees
 <br />
 
 **REPEAT UNTIL PARKING TIME**
+
 turn right 30 degrees --> this is to find the pole
 
 webcam scan for yellow pole in center
