@@ -1,42 +1,42 @@
-from robot starting position
+- from robot starting position
 
-read cone & find correct parking spot
+- read cone & find correct parking spot
 
-23.5 inches left
+- 23.5 inches left
 
-47 inches fwd
+- 47 inches fwd
 
-turn right 90 degrees
+- turn right 90 degrees
 
 <br />
 
 **REPEAT UNTIL PARKING TIME**
 
-turn right 30 degrees --> this is to find the pole
+- turn right 30 degrees --> this is to find the pole
 
-webcam scan for yellow pole in center
+- webcam scan for yellow pole in center
 
-  adjust if needed
+  &emsp;&emsp; - adjust if needed
 
-place cone
+- place cone
 
-retract claw
+- retract claw
 
-turn left 30 degrees
+- turn left 30 degrees
 
-fwd 47 inches
+- fwd 47 inches
 
-pick up new cone
+- pick up new cone
 
-47 inches back
+- 47 inches back
 
 <br /> 
 ~5-10 sec remaining
 
-end loop in parking square 2
+- end loop in parking square 2
 
-move to correct parking position (if not already there)
+- move to correct parking position (if not already there)
 
-  fwd 23.5 inches
+  &emsp;&emsp; - fwd 23.5 inches
   
-  left/right depending on 3/1
+  &emsp;&emsp; - left/right depending on 3/1
