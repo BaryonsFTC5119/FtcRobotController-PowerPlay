@@ -1,3 +1,6 @@
+
+
+
 /* Copyright (c) 2017 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -29,15 +32,15 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+        import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+        import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+        import com.qualcomm.robotcore.hardware.DcMotor;
+        import com.qualcomm.robotcore.hardware.Servo;
+        import com.qualcomm.robotcore.util.ElapsedTime;
+        import com.qualcomm.robotcore.util.Range;
 
-import java.io.FileWriter;
+        import java.io.FileWriter;
 
 /**
  * This file contains an example of an iterative (Non-Linear) "OpMode".
@@ -53,8 +56,8 @@ import java.io.FileWriter;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name = "MaybeMecanum", group = "Iterative OpMode")
-public class MaybeMecanum extends OpMode
+@TeleOp(name = "Mecanum Testing", group = "Iterative OpMode")
+public class MecanumTesting extends OpMode
 {
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -65,7 +68,6 @@ public class MaybeMecanum extends OpMode
     private Controller controller2;
     private boolean arcadeMode = false;
     private boolean slowMode = false;
-    Servo lclaw, lchain;
 
 
     int Bcounter = 0;
@@ -78,8 +80,6 @@ public class MaybeMecanum extends OpMode
         robot = new RealRobot(hardwareMap, telemetry);
         controller = new Controller(gamepad1);
         controller2 = new Controller(gamepad2);
-        lchain = hardwareMap.servo.get("lchain");
-        lclaw = hardwareMap.servo.get("lclaw");
     }
 
     /*
@@ -138,53 +138,95 @@ public class MaybeMecanum extends OpMode
         telemetry.addData("Slow Mode (s)", slowMode ? "YES" : "no.");
         telemetry.addData("Heading (reset: x)", robot.getHeadingDegrees());
 
-        final double x = Math.pow(controller.left_stick_x*1, 3.0);
-        final double y = Math.pow(controller.left_stick_y*1, 3.0);
+        // Mecanum drive is controlled with three axes: drive (front-and-back),
+        // strafe (left-and-right), and twist (rotating the whole chassis).
+        double drive  = controller.left_stick_y;
+        double strafe = controller.left_stick_x;
+        double twist  = controller.right_stick_x;
 
-        final double rotation = -Math.pow(controller.right_stick_x*1, 3.0)/1.5;
-        final double direction = -(Math.atan2(x, y) + (arcadeMode ? robot.getHeading() : 0.0));
-        final double speed = Math.min(1.0, Math.sqrt(x * x + y * y));
+        /*
+         * If we had a gyro and wanted to do field-oriented control, here
+         * is where we would implement it.
+         *
+         * The idea is fairly simple; we have a robot-oriented Cartesian (x,y)
+         * coordinate (strafe, drive), and we just rotate it by the gyro
+         * reading minus the offset that we read in the init() method.
+         * Some rough pseudocode demonstrating:
+         *
+         * if Field Oriented Control:
+         *     get gyro heading
+         *     subtract initial offset from heading
+         *     convert heading to radians (if necessary)
+         *     new strafe = strafe * cos(heading) - drive * sin(heading)
+         *     new drive  = strafe * sin(heading) + drive * cos(heading)
+         *
+         * If you want more understanding on where these rotation formulas come
+         * from, refer to
+         * https://en.wikipedia.org/wiki/Rotation_(mathematics)#Two_dimensions
+         */
 
-        double lf = (slowMode ? governor*.6 : governor) * speed * Math.sin(direction + Math.PI / 4.0) + (slowMode ? .3 : 1)*rotation;
-        double rf = (slowMode ? governor*.6 : governor) * speed * Math.cos(direction + Math.PI / 4.0) - (slowMode ? .3 : 1)*rotation;
-        double lr = (slowMode ? governor*.6 : governor) * speed * Math.cos(direction + Math.PI / 4.0) + (slowMode ? .3 : 1)*rotation;
-        double rr = (slowMode ? governor*.6 : governor) * speed * Math.sin(direction + Math.PI / 4.0) - (slowMode ? .3 : 1)*rotation;
+        // You may need to multiply some of these by -1 to invert direction of
+        // the motor.  This is not an issue with the calculations themselves.
+        double[] speeds = {
+                (drive + strafe + twist),
+                (drive - strafe - twist),
+                (drive - strafe + twist),
+                (drive + strafe - twist)
+        };
 
+        // Because we are adding vectors and motors only take values between
+        // [-1,1] we may need to normalize them.
+
+        // Loop through all values in the speeds[] array and find the greatest
+        // *magnitude*.  Not the greatest velocity.
+        double max = Math.abs(speeds[0]);
+        for(int i = 0; i < speeds.length; i++) {
+            if ( max < Math.abs(speeds[i]) ) max = Math.abs(speeds[i]);
+        }
+
+        // If and only if the maximum is outside of the range we want it to be,
+        // normalize all the other speeds based on the given speed value.
+        if (max > 1) {
+            for (int i = 0; i < speeds.length; i++) speeds[i] /= max;
+        }
+
+        // apply the calculated values to the motors.
+        robot.lf.setPower(speeds[0]);
+        robot.rf.setPower(speeds[1]);
+        robot.lr.setPower(speeds[2]);
+        robot.rr.setPower(speeds[3]);
 
         if(controller.dpadUpOnce()){
-            lchain.setPosition(lchain.getPosition()+0.1);
-
+            robot.lchain.setPosition(robot.lchain.getPosition()+0.05);
         }
 
-        if(controller.dpadDownOnce()) {
-            lchain.setPosition(lchain.getPosition()-0.1);
+        if(controller.dpadDownOnce()){
+            robot.lchain.setPosition(robot.lchain.getPosition()-0.05);
         }
 
-        if(controller.dpadLeftOnce()){
-            lclaw.setPosition(lclaw.getPosition()+0.1);
+        if(controller.leftBumperOnce()){
+            robot.lchain.setDirection(Servo.Direction.FORWARD);
         }
 
-        if(controller.dpadRightOnce()){
-            lclaw.setPosition(lclaw.getPosition()-0.1);
+        if(controller.rightBumperOnce()){
+            robot.lchain.setDirection(Servo.Direction.REVERSE);
         }
 
-        if(controller.left_trigger!=0){
-            robot.ltrolley.setPower(0.8);
+        /*if(controller.leftBumperOnce()) {
+            robot.runUsingEncoders();
+            robot.encoderDrive(.06,24.7,'B');
+            robot.runWithoutEncoders();
         }
-
-        if(controller.right_trigger!=0){
-            robot.ltrolley.setPower(-0.8);
-        }
-
-        if(controller.right_trigger==0&&controller.left_trigger==0){
-            robot.ltrolley.setPower(0);
-        }
+        if(controller.rightBumperOnce()) {
+            robot.runUsingEncoders();
+            robot.encoderDrive(.08,25,'F');
+            robot.runWithoutEncoders();
+        }*/
 
 
 
 
-
-        robot.setMotors(lf, lr, rf, rr);
+        //robot.setMotors(lf, lr, rf, rr);
 
         telemetry.addData("LF Position", robot.lf.getCurrentPosition());
         telemetry.addData("RF Position", robot.rf.getCurrentPosition());
@@ -194,8 +236,8 @@ public class MaybeMecanum extends OpMode
         telemetry.addData("1 Left Joystick X", controller.left_stick_x);
         telemetry.addData("2 Left Joystick Y", controller2.left_stick_y);
         telemetry.addData("2 Left Joystick X", controller2.left_stick_x);
-        telemetry.addData("Lchain wants to go to: ", lchain.getPosition());
-        telemetry.addData("Lclaw wants to go to:  ", lclaw.getPosition());
+        telemetry.addData("L Chain Position: ", robot.lchain.getPosition());
+        telemetry.addData("Current servo direction: ", robot.lchain.getDirection());
 
 //        telemetry.addData("Lift target position", robot.lift.getTargetPosition());
 //        telemetry.addData("Carriage Position", robot.carriage.getPosition());
@@ -215,3 +257,5 @@ public class MaybeMecanum extends OpMode
 
 
 }
+
+

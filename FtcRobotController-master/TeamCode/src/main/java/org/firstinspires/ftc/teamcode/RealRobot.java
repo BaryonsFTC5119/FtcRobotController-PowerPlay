@@ -52,12 +52,14 @@ public class RealRobot {
     private final Telemetry telemetry;
     public final DcMotor lf, lr, rf, rr;
 
-    //public final DcMotor ltrolley, rtrolley;
+    public final DcMotor ltrolley;
+    //public final DcMotor ltrolley;
 
     //, carousel;
 
     //public final Servo lchain, rchain, lclaw, rclaw;
-    public final Servo lchain;
+    //public final Servo lchain;
+    //public final Servo lclaw;
 
 
 
@@ -123,11 +125,12 @@ public class RealRobot {
         lr = hardwareMap.dcMotor.get("lr");
         rr = hardwareMap.dcMotor.get("rr");
 
-        //ltrolley = hardwareMap.dcMotor.get("ltrolley");
+        ltrolley = hardwareMap.dcMotor.get("ltrolley");
         //rtrolley = hardwareMap.dcMotor.get("rtrolley");
         //carousel = hardwareMap.dcMotor.get("carousel");
 
-        lchain = hardwareMap.servo.get("lchain");
+        //lchain = hardwareMap.servo.get("lchain");
+        //lclaw = hardwareMap.servo.get("lclaw");
         /*lclaw = hardwareMap.servo.get("lclaw");
         rclaw = hardwareMap.servo.get("rclaw");
         lchain = hardwareMap.servo.get("lchain");
@@ -135,13 +138,15 @@ public class RealRobot {
         armLevel1 = armLevel0 - 100;
         armLevel2 = armLevel1 - 100;*/
 
-        lf.setDirection(DcMotorSimple.Direction.REVERSE);
-        lr.setDirection(DcMotorSimple.Direction.REVERSE); //reverses the motors
+        lf.setDirection(DcMotorSimple.Direction.FORWARD);
+        lr.setDirection(DcMotorSimple.Direction.FORWARD);
+        rf.setDirection(DcMotorSimple.Direction.REVERSE);
+        rr.setDirection(DcMotorSimple.Direction.REVERSE);//reverses the motors
 
 
 
         setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, lf, lr, rf, rr);
-
+        setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER, lf, rf, rr, lr);
 
 
 
