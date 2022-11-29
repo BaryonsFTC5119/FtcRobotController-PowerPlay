@@ -65,7 +65,7 @@ public class MaybeMecanum extends OpMode
     private Controller controller2;
     private boolean arcadeMode = false;
     private boolean slowMode = false;
-    Servo lclaw, lchain;
+    Servo lclaw, lchain, openSesame;
 
 
     int Bcounter = 0;
@@ -80,6 +80,7 @@ public class MaybeMecanum extends OpMode
         controller2 = new Controller(gamepad2);
         lchain = hardwareMap.servo.get("lchain");
         lclaw = hardwareMap.servo.get("lclaw");
+        openSesame = hardwareMap.servo.get("OS");
     }
 
     /*
@@ -151,33 +152,41 @@ public class MaybeMecanum extends OpMode
         double rr = (slowMode ? governor*.6 : governor) * speed * Math.sin(direction + Math.PI / 4.0) - (slowMode ? .3 : 1)*rotation;
 
 
-        if(controller.dpadUpOnce()){
+        if(controller2.dpadUpOnce()){
             lchain.setPosition(lchain.getPosition()+0.1);
 
         }
 
-        if(controller.dpadDownOnce()) {
+        if(controller2.dpadDownOnce()) {
             lchain.setPosition(lchain.getPosition()-0.1);
         }
 
-        if(controller.dpadLeftOnce()){
+        if(controller2.dpadLeftOnce()){
             lclaw.setPosition(lclaw.getPosition()+0.1);
         }
 
-        if(controller.dpadRightOnce()){
+        if(controller2.dpadRight()Once){
             lclaw.setPosition(lclaw.getPosition()-0.1);
         }
 
-        if(controller.left_trigger!=0){
+        if(controller.left_stick_y>0){
             robot.ltrolley.setPower(0.8);
         }
 
-        if(controller.right_trigger!=0){
+        if(controller.left_stick_y<0){
             robot.ltrolley.setPower(-0.8);
         }
 
-        if(controller.right_trigger==0&&controller.left_trigger==0){
+        if(controller.left_stick_y==0){
             robot.ltrolley.setPower(0);
+        }
+
+        if(controller2.leftBumperOnce()){
+            openSesame.setPosition(openSesame.getPosition()+0.1);
+        }
+
+        if(controller2.rightBumperOnce()){
+            openSesame.setPosition(openSesame.getPosition()-0.1);
         }
 
 
@@ -196,6 +205,7 @@ public class MaybeMecanum extends OpMode
         telemetry.addData("2 Left Joystick X", controller2.left_stick_x);
         telemetry.addData("Lchain wants to go to: ", lchain.getPosition());
         telemetry.addData("Lclaw wants to go to:  ", lclaw.getPosition());
+        telemetry.addData("Open sesame wants to go to: ", openSesame.getPosition());
 
 //        telemetry.addData("Lift target position", robot.lift.getTargetPosition());
 //        telemetry.addData("Carriage Position", robot.carriage.getPosition());
