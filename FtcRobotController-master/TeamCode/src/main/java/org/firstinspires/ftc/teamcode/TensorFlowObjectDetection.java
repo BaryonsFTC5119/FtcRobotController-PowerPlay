@@ -50,7 +50,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * is explained below.
  */
 @TeleOp(name = "Concept: TensorFlow Object Detection Webcam", group = "Concept")
-@Disabled
+//@Disabled
 public class TensorFlowObjectDetection extends LinearOpMode {
 
     /*
@@ -65,11 +65,10 @@ public class TensorFlowObjectDetection extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
-    // needs to be changed
     private static final String[] LABELS = {
-            "1 Bolt",
-            "2 Bulb",
-            "3 Panel"
+            "1 Banana",
+            "2 Whale",
+            "3 Pencil"
     };
 
     /*
@@ -84,8 +83,12 @@ public class TensorFlowObjectDetection extends LinearOpMode {
      * Once you've obtained a license key, copy the string from the Vuforia web site
      * and paste it in to your code on the next line, between the double quotes.
      */
-    private static final String VUFORIA_KEY =
-            " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+    private static final String VUFORIA_KEY ="AQrfl2X/////AAABmXgYPrwW30wdoBAHztdXSDgfzAtx/3aneWzwyCjSRj16HSy" +
+    "36qQ27HjnVGpjTF+XeOKXM5S3kX+HHUnC8HDJBAD44Iw5qDiE9HIDXikjR" +
+    "kp5CJai96FQUIAaHVQs/hXXYMFbVwPY5++U0WOPlSdRMzxvo0+c+Mjs3XVXj" +
+    "ItZ8OKzAtkdGo5eRVMbogXcz6OmpuM0Ts/u7WHD6Ux+Yp9uiIy/pFt/WOIMmIE" +
+    "w7jP8x941HWDbDsrOSZl78yONALbzqE/afXRns4WhmWt+5hLhmKzufU96/sCZbD1T0o" +
+    "NNWN7p6T25lrWpPuvRUBds5ZXbDTEvbgC5RRz9jZHybH0d6M4SvWiMme+Wp26ZAi/Q1fHE";
 
     /**
      * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
@@ -127,6 +130,8 @@ public class TensorFlowObjectDetection extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
+        int parkingspot = 0;
+
         if (opModeIsActive()) {
             while (opModeIsActive()) {
                 if (tfod != null) {
@@ -139,6 +144,11 @@ public class TensorFlowObjectDetection extends LinearOpMode {
                         // step through the list of recognitions and display image position/size information for each one
                         // Note: "Image number" refers to the randomized image orientation/number
                         for (Recognition recognition : updatedRecognitions) {
+
+                            // TENTATIVE (hopefully label is as a string)
+                            // in form 1 Banana, 2 Whale, 3 Pencil
+                            parkingspot = recognition.getLabel()[0];
+
                             double col = (recognition.getLeft() + recognition.getRight()) / 2 ;
                             double row = (recognition.getTop()  + recognition.getBottom()) / 2 ;
                             double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
@@ -151,13 +161,30 @@ public class TensorFlowObjectDetection extends LinearOpMode {
                         }
                         telemetry.update();
                     }
+
+                    if(parkingspot) break;
                 }
             }
+        }
+
+        if(parkingspot <= 1)
+        {
+            // LEFT OPERATIONS
+        }
+        else if (parkingspot == 2)
+        {
+            // MIDDLE OPERATIONS
+        }
+        else
+        {
+            // RIGHT OPERATIONS
         }
     }
 
     /**
      * Initialize the Vuforia localization engine.
+     * 
+     * NOTES: may neeed to load image targets - to help navigation, could be done in vuforia instead
      */
     private void initVuforia() {
         /*
