@@ -81,6 +81,7 @@ public class MaybeMecanum extends OpMode
         lchain = hardwareMap.servo.get("lchain");
         lclaw = hardwareMap.servo.get("lclaw");
         openSesame = hardwareMap.servo.get("OS");
+        lchain.scaleRange(0,0.51);
     }
 
     /*
@@ -121,6 +122,7 @@ public class MaybeMecanum extends OpMode
      */
     @Override
     public void loop() {
+
         controller.update();
         controller2.update();
         robot.loop();
@@ -151,44 +153,51 @@ public class MaybeMecanum extends OpMode
         double lr = (slowMode ? governor*.6 : governor) * speed * Math.cos(direction + Math.PI / 4.0) + (slowMode ? .3 : 1)*rotation;
         double rr = (slowMode ? governor*.6 : governor) * speed * Math.sin(direction + Math.PI / 4.0) - (slowMode ? .3 : 1)*rotation;
 
-
-        if(controller2.dpadUpOnce()){
-            lchain.setPosition(lchain.getPosition()+0.1);
-
+        //top Y, left X, bottom A, right B
+        if(controller2.X()){
+            lchain.setPosition(0);
         }
 
-        if(controller2.dpadDownOnce()) {
-            lchain.setPosition(lchain.getPosition()-0.1);
+        if(controller2.B()){
+            lchain.setPosition(0.5);
         }
 
-        if(controller2.dpadLeftOnce()){
+        if(controller2.AOnce()){
+            lchain.setPosition(lchain.getPosition()-0.2);
+        }
+
+        if(controller2.YOnce()){
+            lchain.setPosition(lchain.getPosition()+0.2);
+        }
+
+        if(controller2.left_trigger>0.5){
             lclaw.setPosition(lclaw.getPosition()+0.1);
         }
 
-        if(controller2.dpadRight()Once){
+        if(controller2.right_trigger>0.5){
             lclaw.setPosition(lclaw.getPosition()-0.1);
         }
 
-        if(controller.left_stick_y>0){
+        if(controller2.left_stick_y<0){
             robot.ltrolley.setPower(0.8);
         }
 
-        if(controller.left_stick_y<0){
-            robot.ltrolley.setPower(-0.8);
+        if(controller2.left_stick_y>0){
+            //robot.ltrolley.setPower(-0.5);
+            robot.ltrolley.setPower(-0.8*controller2.left_stick_y);
         }
 
-        if(controller.left_stick_y==0){
+        if(controller2.left_stick_y==0){
             robot.ltrolley.setPower(0);
         }
 
-        if(controller2.leftBumperOnce()){
+        if(controller2.leftBumper()){
             openSesame.setPosition(openSesame.getPosition()+0.1);
         }
 
-        if(controller2.rightBumperOnce()){
+        if(controller2.rightBumper()){
             openSesame.setPosition(openSesame.getPosition()-0.1);
         }
-
 
 
 
