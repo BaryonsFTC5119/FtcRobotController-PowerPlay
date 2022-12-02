@@ -62,13 +62,13 @@ public class TensorFlowObjectDetection extends LinearOpMode {
      */
 
      // needs to be changed
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
+    // private static final String TFOD_MODEL_ASSET = "PowerPlayV1.tflite";
+    private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/PowerPlayV1.tflite";
 
     private static final String[] LABELS = {
-            "1 Banana",
-            "2 Whale",
-            "3 Pencil"
+            "1", // banana
+            "2", // whale
+            "3" // pencil
     };
 
     /*
