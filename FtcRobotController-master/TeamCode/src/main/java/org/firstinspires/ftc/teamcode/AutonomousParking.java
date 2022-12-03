@@ -38,6 +38,11 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 /**
  * This 2022-2023 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -49,10 +54,25 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Cone parking", group = "Concept")
+@Autonomous(name = "Cone parking")
 //@Disabled
 public class AutonomousParking extends LinearOpMode {
-    private RealRobot robot = new RealRobot(hardwareMap, telemetry);
+    public final DcMotor lf, lr, rf, rr;
+    lf = hardwareMap.dcMotor.get("lf");
+    rf = hardwareMap.dcMotor.get("rf");
+    lr = hardwareMap.dcMotor.get("lr");
+    rr = hardwareMap.dcMotor.get("rr");
+    lf.setDirection(DcMotorSimple.Direction.FORWARD);
+    lr.setDirection(DcMotorSimple.Direction.FORWARD);
+    rf.setDirection(DcMotorSimple.Direction.REVERSE);
+    rr.setDirection(DcMotorSimple.Direction.REVERSE);
+    setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE, lf, lr, rf, rr);
+    setMotorMode(DcMotor.RunMode.RUN_USING_ENCODER, lf, rf, rr, lr);
+
+    static final double     COUNTS_PER_MOTOR_REV    = 145.6 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 0.5;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 3.77953 ;     // For figuring circumference || Previous value of 3.93701
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
     /*
      * Specify the source for the Tensor Flow Model.
      * If the TensorFlowLite object model is included in the Robot Controller App as an "asset",
@@ -151,13 +171,13 @@ public class AutonomousParking extends LinearOpMode {
                             telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
                             telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
                             telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
-                            
+
                             if(recognition.getLabel().equals("1")){
-                            robot.encoderDrive(0.6, 10.0, "L");
+                            encoderDrive(0.6, 10.0, "L");
                         }
 
                         if(recognition.getLabel().equals("3")){
-                            robot.encoderDrive(0.6, 10.0, "R");
+                            encoderDrive(0.6, 10.0, "R");
                         }
                         }
 
@@ -202,5 +222,110 @@ public class AutonomousParking extends LinearOpMode {
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
         // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+    }
+
+    public void driveInches(double speed, double inches){
+        lf.setPower(speed);
+        lr.setPower(speed);
+        rf.setPower(speed);
+        rr.setPower(speed);
+
+        lf.setTargetPosition((int) (inches * COUNTS_PER_INCH));
+        lr.setTargetPosition((int) (inches * COUNTS_PER_INCH));
+        rf.setTargetPosition((int) (inches * COUNTS_PER_INCH));
+        rr.setTargetPosition((int) (inches * COUNTS_PER_INCH));
+
+        lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+    }
+
+    public void encoderDrive(double power, double distance, char direction) {
+
+        setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        // How many turns do I need the wheels to go [distance] inches?
+
+        // The distance you drive with one turn of the wheel is the circumference of the wheel
+
+        //Re-measure
+        double circumference = ((direction == 'F' || direction == 'B') ? Math.PI*WHEEL_DIAMETER_INCHES : 11.4);
+        //Gear ratio stuff :)
+        double TICKS_PER_INCH = MOTOR_TICK_COUNTS/circumference;
+
+        int eTarget = (int)(TICKS_PER_INCH*distance);
+
+
+
+        ((DcMotorEx)lf).setTargetPositionTolerance(12);
+        ((DcMotorEx)rf).setTargetPositionTolerance(12);
+        ((DcMotorEx)lr).setTargetPositionTolerance(12);
+        ((DcMotorEx)rr).setTargetPositionTolerance(12);
+
+        if(direction == 'F')
+        {
+            lf.setTargetPosition(-eTarget + lf.getCurrentPosition());
+            rf.setTargetPosition(eTarget + rf.getCurrentPosition());
+            lr.setTargetPosition(eTarget + lr.getCurrentPosition());
+            rr.setTargetPosition(-eTarget + rr.getCurrentPosition());
+        }
+        else if (direction == 'B')
+        {
+            lf.setTargetPosition(eTarget + lf.getCurrentPosition());
+            rf.setTargetPosition(-eTarget + rf.getCurrentPosition());
+            lr.setTargetPosition(-eTarget + lr.getCurrentPosition());
+            rr.setTargetPosition(eTarget + rr.getCurrentPosition());
+        }
+        else if (direction == 'L')
+        {
+            lf.setTargetPosition(eTarget + lf.getCurrentPosition());
+            rf.setTargetPosition(eTarget + rf.getCurrentPosition());
+            lr.setTargetPosition(eTarget + lr.getCurrentPosition());
+            rr.setTargetPosition(eTarget + rr.getCurrentPosition());
+        }
+        else if (direction == 'R')
+        {
+            lf.setTargetPosition(-eTarget + lf.getCurrentPosition());
+            rf.setTargetPosition(-eTarget + rf.getCurrentPosition());
+            lr.setTargetPosition(-eTarget + lr.getCurrentPosition());
+            rr.setTargetPosition(-eTarget + rr.getCurrentPosition());
+        }
+
+        //set the power desired for the motors
+        lf.setPower(power*.7*(direction == 'R' || direction == 'F' ? 1.3 : 1));
+        rf.setPower(power*.7*(direction == 'R' || direction == 'F' ? 1.3 : 1));
+        lr.setPower(power*.7);
+        rr.setPower(power*.7);
+
+        // set the motors to RUN_TO_POSITION
+        lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+//        lf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        lr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        while(lf.isBusy() || rf.isBusy() || lr.isBusy() || rr.isBusy())
+        {
+            loop();
+            // make sure to not do anything while the motors are running
+            telemetry.addData("Path", "Driving " + distance + " inches");
+            /*telemetry.addData("Slide position:",slide.getCurrentPosition());
+            telemetry.addData("Slide target:",slide.getTargetPosition());*/
+            telemetry.addData("Current position", lf.getCurrentPosition());
+            telemetry.addData("Target position", lf.getTargetPosition());
+            telemetry.addData("Heading", getHeadingDegrees());
+
+
+
+            telemetry.update();
+        }
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
     }
 }
