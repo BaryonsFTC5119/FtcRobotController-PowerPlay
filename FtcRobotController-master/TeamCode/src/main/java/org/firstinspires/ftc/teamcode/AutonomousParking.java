@@ -52,7 +52,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 @TeleOp(name = "Cone parking", group = "Concept")
 //@Disabled
 public class AutonomousParking extends LinearOpMode {
-
+    private RealRobot robot = new RealRobot(hardwareMap, telemetry);
     /*
      * Specify the source for the Tensor Flow Model.
      * If the TensorFlowLite object model is included in the Robot Controller App as an "asset",
@@ -151,15 +151,17 @@ public class AutonomousParking extends LinearOpMode {
                             telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
                             telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
                             telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
-                        }
-
-                        if(recognition.getLabel().equals("1")){
-                            encoderDrive(0.6, 10.0, "L");
+                            
+                            if(recognition.getLabel().equals("1")){
+                            robot.encoderDrive(0.6, 10.0, "L");
                         }
 
                         if(recognition.getLabel().equals("3")){
-                            encoderDrive(0.6, 10.0, "R");
+                            robot.encoderDrive(0.6, 10.0, "R");
                         }
+                        }
+
+                        
                         
                         telemetry.update();
                     }
