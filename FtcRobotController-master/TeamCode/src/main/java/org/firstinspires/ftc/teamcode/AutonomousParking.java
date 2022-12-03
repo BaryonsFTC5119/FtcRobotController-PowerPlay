@@ -157,7 +157,7 @@ public class AutonomousParking extends LinearOpMode {
                             encoderDrive(0.6, 10.0, "L");
                         }
 
-                        if(reocgnition.getLable().equals("3")){
+                        if(recognition.getLabel().equals("3")){
                             encoderDrive(0.6, 10.0, "R");
                         }
                         
