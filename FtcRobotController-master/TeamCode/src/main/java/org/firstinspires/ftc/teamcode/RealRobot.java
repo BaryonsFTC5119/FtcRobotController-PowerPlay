@@ -44,7 +44,7 @@ public class RealRobot {
 
     static final double     COUNTS_PER_MOTOR_REV    = 145.6 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 0.5;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 3.56953 ;     // For figuring circumference || Previous value of 3.93701 & 3.77953
+    static final double     WHEEL_DIAMETER_INCHES   = 3.77953 ;     // For figuring circumference || Previous value of 3.93701
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
 
@@ -531,7 +531,7 @@ public class RealRobot {
      */
 
     public void encoderDrive(double power, double distance, char direction) {
-
+        distance *= 4;
         setMotorZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // How many turns do I need the wheels to go [distance] inches?
@@ -539,7 +539,7 @@ public class RealRobot {
         // The distance you drive with one turn of the wheel is the circumference of the wheel
 
         //Re-measure
-        double circumference = (14/28)*((direction == 'F' || direction == 'B') ? Math.PI*WHEEL_DIAMETER_INCHES : 11.4);
+        double circumference = (28/14)*((direction == 'F' || direction == 'B') ? Math.PI*WHEEL_DIAMETER_INCHES : 11.4);
         double TICKS_PER_INCH = MOTOR_TICK_COUNTS/circumference;
 
         int eTarget = (int)(TICKS_PER_INCH*distance);
