@@ -1,34 +1,5 @@
-/* Copyright (c) 2017 FIRST. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided that
- * the following conditions are met:
- *
- * Redistributions of source code must retain the above copyright notice, this list
- * of conditions and the following disclaimer.
- *
- * Redistributions in binary form must reproduce the above copyright notice, this
- * list of conditions and the following disclaimer in the documentation and/or
- * other materials provided with the distribution.
- *
- * Neither the name of FIRST nor the names of its contributors may be used to endorse or
- * promote products derived from this software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
- * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 
 package org.firstinspires.ftc.teamcode;
-
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -69,6 +40,7 @@ public class MaybeMecanum extends OpMode
 
 
     int Bcounter = 0;
+    String state = "end";
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -81,7 +53,8 @@ public class MaybeMecanum extends OpMode
         lchain = hardwareMap.servo.get("lchain");
         lclaw = hardwareMap.servo.get("lclaw");
         openSesame = hardwareMap.servo.get("OS");
-        lchain.scaleRange(0,0.51);
+        lchain.scaleRange(0,0.6);
+        robot.ltrolley.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS);
     }
 
     /*
@@ -108,6 +81,9 @@ public class MaybeMecanum extends OpMode
     public void start() {
         runtime.reset();
         robot.resetHeading();
+        robot.ltrolley.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.ltrolley.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //robot.ltrolley.setTargetPosition(2000);
 
     }
 
@@ -122,7 +98,8 @@ public class MaybeMecanum extends OpMode
      */
     @Override
     public void loop() {
-
+        //robot.ltrolley.setTargetPosition(2000);
+        //robot.ltrolley.setPower(0.2);
         controller.update();
         controller2.update();
         robot.loop();
@@ -159,7 +136,7 @@ public class MaybeMecanum extends OpMode
         }
 
         if(controller2.B()){
-            lchain.setPosition(0.5);
+            lchain.setPosition(1);
         }
 
         if(controller2.AOnce()){
@@ -170,11 +147,11 @@ public class MaybeMecanum extends OpMode
             lchain.setPosition(lchain.getPosition()+0.2);
         }
 
-        if(controller2.left_trigger>0.5){
+        if(controller2.left_trigger>0.2){
             lclaw.setPosition(lclaw.getPosition()+0.1);
         }
 
-        if(controller2.right_trigger>0.5){
+        if(controller2.right_trigger>0.2){
             lclaw.setPosition(lclaw.getPosition()-0.1);
         }
 
@@ -198,6 +175,33 @@ public class MaybeMecanum extends OpMode
         if(controller2.rightBumper()){
             openSesame.setPosition(openSesame.getPosition()-0.1);
         }
+        if(controller2.dpadDownOnce()) robot.light.setPower(0.5);
+        if(controller2.dpadRightOnce()) robot.light.setPower(1.0);
+
+        if(controller2.dpadUpOnce()) {
+            state = "lift"; //-461
+
+        }
+        if(state.equals("start")){
+            if(robot.ltrolley.getCurrentPosition()>=-461){
+                state="lift";
+
+            }
+        }
+        if(state.equals("lift")){
+            robot.ltrolley.setTargetPosition(2000);
+            robot.ltrolley.setPower(0.8);
+            lchain.setPosition(0.6);
+            if(robot.ltrolley.getCurrentPosition()>=1900){
+                //motor just stops
+
+                //lclaw.setPosition(0.0);
+                //lchain.setPosition(1.0);
+                state="end";
+                //robot.ltrolley.setPower(0);
+            }
+        }
+
 
 
 
@@ -215,6 +219,9 @@ public class MaybeMecanum extends OpMode
         telemetry.addData("Lchain wants to go to: ", lchain.getPosition());
         telemetry.addData("Lclaw wants to go to:  ", lclaw.getPosition());
         telemetry.addData("Open sesame wants to go to: ", openSesame.getPosition());
+        telemetry.addData("LTrolley position: ", robot.ltrolley.getCurrentPosition());
+        telemetry.addData("Light power", robot.light.getPower());
+        telemetry.addData("Status ", state);
 
 //        telemetry.addData("Lift target position", robot.lift.getTargetPosition());
 //        telemetry.addData("Carriage Position", robot.carriage.getPosition());

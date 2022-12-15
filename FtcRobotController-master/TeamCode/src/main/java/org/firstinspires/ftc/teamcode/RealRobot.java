@@ -44,7 +44,7 @@ public class RealRobot {
 
     static final double     COUNTS_PER_MOTOR_REV    = 145.6 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 0.5;     // This is < 1.0 if geared UP
-    static final double     WHEEL_DIAMETER_INCHES   = 3.77953 ;     // For figuring circumference || Previous value of 3.93701
+    static final double     WHEEL_DIAMETER_INCHES   = 3.56953 ;     // For figuring circumference || Previous value of 3.93701 & 3.77953
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * 3.1415);
 
@@ -52,7 +52,7 @@ public class RealRobot {
     private final Telemetry telemetry;
     public final DcMotor lf, lr, rf, rr;
 
-    public final DcMotor ltrolley;
+    public final DcMotor ltrolley, light;
     //public final DcMotor ltrolley;
 
     //, carousel;
@@ -124,6 +124,7 @@ public class RealRobot {
         rf = hardwareMap.dcMotor.get("rf");
         lr = hardwareMap.dcMotor.get("lr");
         rr = hardwareMap.dcMotor.get("rr");
+        light = hardwareMap.dcMotor.get("light");
 
         ltrolley = hardwareMap.dcMotor.get("ltrolley");
         //rtrolley = hardwareMap.dcMotor.get("rtrolley");
@@ -538,8 +539,7 @@ public class RealRobot {
         // The distance you drive with one turn of the wheel is the circumference of the wheel
 
         //Re-measure
-        double circumference = ((direction == 'F' || direction == 'B') ? Math.PI*WHEEL_DIAMETER_INCHES : 11.4);
-        //Gear ratio stuff :)
+        double circumference = (14/28)*((direction == 'F' || direction == 'B') ? Math.PI*WHEEL_DIAMETER_INCHES : 11.4);
         double TICKS_PER_INCH = MOTOR_TICK_COUNTS/circumference;
 
         int eTarget = (int)(TICKS_PER_INCH*distance);
@@ -551,28 +551,28 @@ public class RealRobot {
         ((DcMotorEx)lr).setTargetPositionTolerance(12);
         ((DcMotorEx)rr).setTargetPositionTolerance(12);
 
-        if(direction == 'F')
+        if(direction == 'R')
         {
             lf.setTargetPosition(-eTarget + lf.getCurrentPosition());
             rf.setTargetPosition(eTarget + rf.getCurrentPosition());
             lr.setTargetPosition(eTarget + lr.getCurrentPosition());
             rr.setTargetPosition(-eTarget + rr.getCurrentPosition());
         }
-        else if (direction == 'B')
+        else if (direction == 'L')
         {
             lf.setTargetPosition(eTarget + lf.getCurrentPosition());
             rf.setTargetPosition(-eTarget + rf.getCurrentPosition());
             lr.setTargetPosition(-eTarget + lr.getCurrentPosition());
             rr.setTargetPosition(eTarget + rr.getCurrentPosition());
         }
-        else if (direction == 'L')
+        else if (direction == 'B')
         {
             lf.setTargetPosition(eTarget + lf.getCurrentPosition());
             rf.setTargetPosition(eTarget + rf.getCurrentPosition());
             lr.setTargetPosition(eTarget + lr.getCurrentPosition());
             rr.setTargetPosition(eTarget + rr.getCurrentPosition());
         }
-        else if (direction == 'R')
+        else if (direction == 'F')
         {
             lf.setTargetPosition(-eTarget + lf.getCurrentPosition());
             rf.setTargetPosition(-eTarget + rf.getCurrentPosition());
@@ -690,9 +690,34 @@ public class RealRobot {
 //        lr.setPower(0);
 //        rr.setPower(0);
 
+        while(lf.isBusy() || rf.isBusy() || lr.isBusy() || rr.isBusy())
+        {
+            loop();
+            // make sure to not do anything while the motors are running
+            telemetry.addData("Path", "Driving " + distance + " inches");
+            /*telemetry.addData("Slide position:",slide.getCurrentPosition());
+            telemetry.addData("Slide target:",slide.getTargetPosition());*/
+            telemetry.addData("Current position", lf.getCurrentPosition());
+            telemetry.addData("Target position", lf.getTargetPosition());
+            telemetry.addData("Heading", getHeadingDegrees());
 
+
+
+            telemetry.update();
+        }
         telemetry.addData("Path", "Complete");
+        //telemetry.addData("Heading: ", getHeadingDegrees());
         telemetry.update();
+    }
+
+    public void rotateToHeading(int degrees, double power){
+        int head = (int)getHeadingDegrees();
+        while(!(head>degrees-5&&head<degrees+5)){
+            encoderRotate(10, power);
+            head = (int)getHeadingDegrees();
+            loop();
+            telemetry.addData("Heading: ", getHeadingDegrees());
+        }
     }
 
     public void mecanumEncoders()
