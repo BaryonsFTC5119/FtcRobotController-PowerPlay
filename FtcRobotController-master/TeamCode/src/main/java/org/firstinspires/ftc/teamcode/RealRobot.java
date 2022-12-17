@@ -659,10 +659,10 @@ public class RealRobot {
         }
 
         //set the power desired for the motors
-        lf.setPower(power*-.7);
-        rf.setPower(power*-.7);
-        lr.setPower(power*-.7);
-        rr.setPower(power*-.7);
+        lf.setPower(power*-1);//power used to be *-0.7
+        rf.setPower(power*-1);
+        lr.setPower(power*-1);
+        rr.setPower(power*-1);
 
 //        lf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 //        lf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -712,8 +712,8 @@ public class RealRobot {
 
     public void rotateToHeading(int degrees, double power){
         int head = (int)getHeadingDegrees();
-        while(!(head>degrees-5&&head<degrees+5)){
-            encoderRotate(10, power);
+        while(!(head>degrees-3&&head<degrees+3)){
+            encoderRotate(-10, power);
             head = (int)getHeadingDegrees();
             loop();
             telemetry.addData("Heading: ", getHeadingDegrees());

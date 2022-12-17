@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -14,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import java.util.*;
 
 @Autonomous(name = "Cone parking")
-public class AutonomousParking extends LinearOpMode {
+public class Parking extends LinearOpMode {
     RealRobot robot;
     private static final String TFOD_MODEL_ASSET = "/sdcard/FIRST/tflitemodels/PowerPlayV2.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
@@ -48,6 +49,7 @@ public class AutonomousParking extends LinearOpMode {
         initVuforia();
         initTfod();
         initialize();
+
 
         /**
          * Activate TensorFlow Object Detection before we wait for the start command.
@@ -115,22 +117,50 @@ public class AutonomousParking extends LinearOpMode {
                 }
             }
         }
+
         //openSesame.setPosition(0.0);
         //drive forward, rotate, state machine
-        robot.encoderDrive(0.3, 56.5, 'B');
-        robot.rotateToHeading(-115, 0.5);
+        robot.encoderDrive(0.3, 52.0, 'B');
+        robot.rotateToHeading(-90, 1.0);
+        robot.encoderDrive(0.3, 6.0, 'B');
+        openSesame.setPosition(1.0);
+        robot.ltrolley.setTargetPosition(600);
+        lclaw.setPosition(0.0);
+        lchain.setPosition(0.45);
+        robot.ltrolley.setPower(-0.7);
+        sleep(1000);
+        robot.ltrolley.setPower(0.0);
+        robot.ltrolley.setPower(0.7);
+        sleep(2450);
+        robot.ltrolley.setPower(0.0);
+        robot.encoderDrive(0.3, 6.3, 'R');
+        //robot.encoderDrive(0.3, 6.0, 'B');
+        //robot.rotateToHeading(-148, 0.8);
         //drop cone
         //robot.ltrolley.setTargetPosition(2000);
         //robot.ltrolley.setPower(0.8);
         //lchain.setPosition(0.8);
-        robot.encoderDrive(0.3, 4.625, 'F');
-
+        //robot.encoderDrive(0.3, 5, 'B');
+        //8lchain.setPosition(0.6);
+        lclaw.setPosition(1.0);
+        sleep(500);
+        lchain.setPosition(0.0);
+        robot.rotateToHeading(180, 1.0);
+        robot.encoderDrive(0.3, 40.0, 'B');
         /*robot.encoderDrive(0.3, 80, 'F'); //LRFB RLBF
         robot.encoderDrive(0.3, 80, 'B');
         robot.encoderDrive(0.3, 50, 'L');
         robot.encoderDrive(0.3, 50, 'R');
         //robot.encoderRotate(360, 0.5);
         robot.rotateToHeading(60, 0.3);*/
+        if(coneNum==1){
+            robot.encoderDrive(0.3, 20.0, 'L');
+        }
+
+        if(coneNum==3){
+            robot.encoderDrive(0.3, 20.0, 'R');
+            //robot.rotateToHeading(0, 1.0);
+        }
 
 
     }
@@ -192,11 +222,11 @@ public class AutonomousParking extends LinearOpMode {
         lchain = hardwareMap.servo.get("lchain");
         lclaw = hardwareMap.servo.get("lclaw");
         openSesame = hardwareMap.servo.get("OS");
-        lchain.scaleRange(0,0.6);
-        /*robot.ltrolley.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS);
+        //lchain.scaleRange(0,0.8);
+        /*robot.ltrolley.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS);*/
         robot.resetHeading();
-        robot.ltrolley.setTargetPosition(1000);
-        openSesame.setPosition(1.0);*/
+
+
 
     }
 }
