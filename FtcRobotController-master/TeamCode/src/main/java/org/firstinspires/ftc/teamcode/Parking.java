@@ -14,8 +14,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import java.util.*;
 
-@Autonomous(name = "Sleeve Parking")
-public class SleeveParking extends LinearOpMode {
+@Autonomous(name = "Cone parking")
+public class Parking extends LinearOpMode {
     RealRobot robot;
     private static final String TFOD_MODEL_ASSET = "/sdcard/FIRST/tflitemodels/PowerPlayV2.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
@@ -120,27 +120,71 @@ public class SleeveParking extends LinearOpMode {
 
         //openSesame.setPosition(0.0);
         //drive forward, rotate, state machine
-        robot.encoderDrive(0.3, 26.0, 'B');
-        if(coneNum==1){
-            robot.encoderDrive(0.3, 22.0, 'R');
-        }
-        if(coneNum==3){
-            robot.encoderDrive(0.3, 20.0, 'L');
-        }
-        robot.encoderDrive(0.3, 20.0, 'B');
+        lclaw.setPosition(0.0);
+        robot.encoderDrive(0.9, 52.0, 'B');
+        robot.rotateToHeading(-90, 1.0);
         openSesame.setPosition(1.0);
-        robot.ltrolley.setTargetPosition(600);
+        robot.encoderDrive(0.3, 12.0, 'B');
+        robot.ltrolley.setTargetPosition(650);
         lclaw.setPosition(0.0);
         lchain.setPosition(0.45);
+        robot.rotateToHeading(-100, 1.0);
+//          robot.encoderDrive(0.8,3.0,'R');
         robot.ltrolley.setPower(-0.7);
         sleep(1000);
         robot.ltrolley.setPower(0.0);
         robot.ltrolley.setPower(0.7);
         sleep(2450);
         robot.ltrolley.setPower(0.0);
-        
+        lchain.setPosition(0.55);
+        lclaw.setPosition(1.0);
+        sleep(2000);
+        lchain.setPosition(0.45);
+        sleep(1000);
+        robot.ltrolley.setTargetPosition(50);
+        robot.ltrolley.setPower(-0.7);
+        sleep(2500);
+        robot.ltrolley.setPower(0);
+        lchain.setPosition(0.45);
+        lclaw.setPosition(0.0);
+        sleep(1000);
+        lchain.setPosition(0.55);
+        robot.ltrolley.setTargetPosition(650);
+        robot.ltrolley.setPower(0.7);
+        sleep(2450);
+        robot.ltrolley.setPower(0.0);
+        lclaw.setPosition(1.0);
 
-
+        //robot.encoderDrive(0.3, 6, 'R');
+        //robot.encoderDrive(0.3, 6.0, 'B');
+        //robot.rotateToHeading(-148, 0.8);
+        //drop cone
+        //robot.ltrolley.setTargetPosition(2000);
+        //robot.ltrolley.setPower(0.8);
+        //lchain.setPosition(0.8);
+        //robot.encoderDrive(0.3, 5, 'B');
+        //8lchain.setPosition(0.6);
+//        lclaw.setPosition(1.0);
+//        sleep(500);
+//        lchain.setPosition(0.0);
+//        robot.rotateToHeading(180, 1.0);
+//        robot.encoderDrive(0.3, 40.0, 'B');
+//        /*robot.encoderDrive(0.3, 80, 'F'); //LRFB RLBF
+//        robot.encoderDrive(0.3, 80, 'B');
+//        robot.encoderDrive(0.3, 50, 'L');
+//        robot.encoderDrive(0.3, 50, 'R');
+//        //robot.encoderRotate(360, 0.5);
+//        robot.rotateToHeading(60, 0.3);*/
+//        if(coneNum==1){
+//            robot.encoderDrive(0.3, 20.0, 'L');
+//        }
+//
+//        if(coneNum==3){
+//            robot.encoderDrive(0.3, 20.0, 'R');
+//            //robot.rotateToHeading(0, 1.0);
+//        }
+//
+//
     }
 
     /**
