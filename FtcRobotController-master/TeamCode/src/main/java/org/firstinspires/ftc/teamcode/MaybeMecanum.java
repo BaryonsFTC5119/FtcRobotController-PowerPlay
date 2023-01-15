@@ -64,7 +64,7 @@ public class MaybeMecanum extends OpMode
     public void init_loop() {
         controller.update();
         if (controller.AOnce()) {
-            arcadeMode = !arcadeMode;
+            //arcadeMode = !arcadeMode;
         }
         if (controller.YOnce()) {
             slowMode = !slowMode;
@@ -149,19 +149,23 @@ public class MaybeMecanum extends OpMode
 
         if(controller2.left_trigger>0.2){
             lclaw.setPosition(lclaw.getPosition()+0.1);
+            state="end";
         }
 
         if(controller2.right_trigger>0.2){
             lclaw.setPosition(lclaw.getPosition()-0.1);
+            state="end";
         }
 
         if(controller2.left_stick_y<0){
             robot.ltrolley.setPower(0.8);
+            state="end";
         }
 
         if(controller2.left_stick_y>0){
             //robot.ltrolley.setPower(-0.5);
             robot.ltrolley.setPower(-0.8*controller2.left_stick_y);
+            state="end";
         }
 
         if(controller2.left_stick_y==0){
@@ -190,7 +194,7 @@ public class MaybeMecanum extends OpMode
         }
         if(state.equals("lift")){
             robot.ltrolley.setTargetPosition(2000);
-            robot.ltrolley.setPower(0.8);
+            robot.ltrolley.setPower(1.0);
             lchain.setPosition(0.6);
             if(robot.ltrolley.getCurrentPosition()>=1900){
                 //motor just stops

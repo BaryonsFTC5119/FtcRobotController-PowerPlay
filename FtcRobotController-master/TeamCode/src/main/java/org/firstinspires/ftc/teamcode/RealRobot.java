@@ -607,7 +607,21 @@ public class RealRobot {
             telemetry.addData("Current position", lf.getCurrentPosition());
             telemetry.addData("Target position", lf.getTargetPosition());
             telemetry.addData("Heading", getHeadingDegrees());
+            if(getHeadingDegrees()>1||getHeadingDegrees()<-1){
+                preciseRotate(-1*getHeadingDegrees(), 0.3);
+                telemetry.addData("Uh oh", 1);
+                //set the power desired for the motors
+                lf.setPower(power*.7*(direction == 'R' || direction == 'F' ? 1.3 : 1));
+                rf.setPower(power*.7*(direction == 'R' || direction == 'F' ? 1.3 : 1));
+                lr.setPower(power*.7);
+                rr.setPower(power*.7);
 
+                // set the motors to RUN_TO_POSITION
+                lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                lr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                rr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
 
 
             telemetry.update();
@@ -712,12 +726,16 @@ public class RealRobot {
 
     public void rotateToHeading(int degrees, double power){
         int head = (int)getHeadingDegrees();
-        while(!(head>degrees-3&&head<degrees+3)){
-            encoderRotate(-10, power);
-            head = (int)getHeadingDegrees();
-            loop();
-            telemetry.addData("Heading: ", getHeadingDegrees());
-        }
+        int diff=head-degrees;
+        encoderRotate(-diff, power);
+        loop();
+        telemetry.addData("Heading: ", getHeadingDegrees());
+//        while(!(head>degrees-3&&head<degrees+3)){
+//            encoderRotate(-10, power);
+//            head = (int)getHeadingDegrees();
+//            loop();
+//            telemetry.addData("Heading: ", getHeadingDegrees());
+//        }
     }
 
     public void mecanumEncoders()
@@ -737,54 +755,106 @@ public class RealRobot {
         }
     }
     /**
-     @param degrees //degrees (-360 to 360) you want to rotate (relative to intial heading of robot)
+     @param degrees heading that you are rotating to
      */
-    public void rotate(int degrees, double power)
+    public void rotate(double degrees, double power)
     {
-        if(power >= 4) degrees-=(degrees>0 ? 2 : -2);
-
-        if(getHeadingDegrees() > degrees)
+        double endHeading = getHeadingDegrees()-degrees;
+        if(degrees > 0)
         {
             lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+            lf.setPower(-power);
+            lr.setPower(-power);
+            rf.setPower(power);
+            rr.setPower(power);
             do {
                 loop();
-                lf.setPower(-power);
-                lr.setPower(power);
-                rf.setPower(-power);
-                rr.setPower(power);
                 telemetry.addData("Heading", getHeadingDegrees());
                 telemetry.addData("Absolute", Math.abs(degrees-getHeadingDegrees()));
+                telemetry.addData("Degrees", degrees);
                 telemetry.update();
 
-            }while(getHeadingDegrees() - degrees > 2);
+            } while(Math.abs(getHeadingDegrees()-endHeading) > 4);
             lf.setPower(0);
             lr.setPower(0);
             rf.setPower(0);
             rr.setPower(0);
         }
-        else if(getHeadingDegrees() < degrees)
+        else if(degrees < 0)
         {
             lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             rr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+            lf.setPower(power);
+            lr.setPower(power);
+            rf.setPower(-power);
+            rr.setPower(-power);
             do {
-                loop();
-                lf.setPower(power);
-                lr.setPower(-power);
-                rf.setPower(power);
-                rr.setPower(-power);
                 loop();
                 telemetry.addData("Heading", getHeadingDegrees());
                 telemetry.addData("Absolute", Math.abs(degrees-getHeadingDegrees()));
+                telemetry.addData("Degrees", degrees);
                 telemetry.update();
 
-            }while(degrees - getHeadingDegrees() > 2);
+            }while(Math.abs(getHeadingDegrees()-endHeading) > 4);
+            lf.setPower(0);
+            lr.setPower(0);
+            rf.setPower(0);
+            rr.setPower(0);
+        }
+    }
+    public void preciseRotate(double degrees, double power)
+    {
+        double endHeading = getHeadingDegrees()-degrees;
+        if(degrees > 0)
+        {
+            lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            lf.setPower(-power);
+            lr.setPower(-power);
+            rf.setPower(power);
+            rr.setPower(power);
+            do {
+                loop();
+                telemetry.addData("Heading", getHeadingDegrees());
+                telemetry.addData("Absolute", Math.abs(degrees-getHeadingDegrees()));
+                telemetry.addData("Degrees", degrees);
+                telemetry.update();
+
+            } while(Math.abs(getHeadingDegrees()-endHeading) > 0.5);
+            lf.setPower(0);
+            lr.setPower(0);
+            rf.setPower(0);
+            rr.setPower(0);
+        }
+        else if(degrees < 0)
+        {
+            lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            lf.setPower(power);
+            lr.setPower(power);
+            rf.setPower(-power);
+            rr.setPower(-power);
+            do {
+                loop();
+                telemetry.addData("Heading", getHeadingDegrees());
+                telemetry.addData("Absolute", Math.abs(degrees-getHeadingDegrees()));
+                telemetry.addData("Degrees", degrees);
+                telemetry.update();
+
+            }while(Math.abs(getHeadingDegrees()-endHeading) > 0.5);
             lf.setPower(0);
             lr.setPower(0);
             rf.setPower(0);

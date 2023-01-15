@@ -121,14 +121,19 @@ public class Parking extends LinearOpMode {
         //openSesame.setPosition(0.0);
         //drive forward, rotate, state machine
         lclaw.setPosition(0.0);
-        robot.encoderDrive(0.9, 52.0, 'B');
-        robot.rotateToHeading(-90, 1.0);
+        robot.encoderDrive(0.9, 50.0, 'B'); //52.0
+//      robot.rotateToHeading(-90, 1.0);
+        //robot.rotate(-90,0.3);
+        //robot.rotate(90,0.3);
+/*      sleep(1000);
         openSesame.setPosition(1.0);
         robot.encoderDrive(0.3, 12.0, 'B');
         robot.ltrolley.setTargetPosition(650);
         lclaw.setPosition(0.0);
         lchain.setPosition(0.45);
-        robot.rotateToHeading(-100, 1.0);
+//        robot.rotateToHeading(-100, 1.0);
+        robot.rotate(-10,0.3);
+        sleep(1000);
 //          robot.encoderDrive(0.8,3.0,'R');
         robot.ltrolley.setPower(-0.7);
         sleep(1000);
@@ -154,6 +159,7 @@ public class Parking extends LinearOpMode {
         sleep(2450);
         robot.ltrolley.setPower(0.0);
         lclaw.setPosition(1.0);
+*/
 
         //robot.encoderDrive(0.3, 6, 'R');
         //robot.encoderDrive(0.3, 6.0, 'B');

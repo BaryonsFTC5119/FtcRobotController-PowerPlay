@@ -120,25 +120,30 @@ public class SleeveParking extends LinearOpMode {
 
         //openSesame.setPosition(0.0);
         //drive forward, rotate, state machine
-        robot.encoderDrive(0.3, 26.0, 'B');
-        if(coneNum==1){
-            robot.encoderDrive(0.3, 22.0, 'R');
+        if(coneNum==1) {
+            robot.encoderDrive(0.3, 26, 'R');
+            sleep(500);
         }
-        if(coneNum==3){
-            robot.encoderDrive(0.3, 20.0, 'L');
+        if(coneNum==3) {
+            robot.encoderDrive(0.3, 27.5, 'L');
+            sleep(500);
+            robot.encoderDrive(0.3, 37.5, 'B');
+        } else {
+            robot.encoderDrive(0.3, 40.0, 'B');
         }
-        robot.encoderDrive(0.3, 20.0, 'B');
+
         openSesame.setPosition(1.0);
         robot.ltrolley.setTargetPosition(600);
         lclaw.setPosition(0.0);
-        lchain.setPosition(0.45);
+        lchain.setPosition(0.2);
         robot.ltrolley.setPower(-0.7);
         sleep(1000);
         robot.ltrolley.setPower(0.0);
         robot.ltrolley.setPower(0.7);
         sleep(2450);
         robot.ltrolley.setPower(0.0);
-        
+        openSesame.setPosition(0.0);
+
 
 
     }
