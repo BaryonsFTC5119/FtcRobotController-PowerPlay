@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import java.util.List;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
@@ -14,8 +13,8 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import java.util.*;
 
-@Autonomous(name = "Cone parking")
-public class Parking extends LinearOpMode {
+@Autonomous(name = "Cone parking Left")
+public class ParkingLeft extends LinearOpMode {
     RealRobot robot;
     private static final String TFOD_MODEL_ASSET = "/sdcard/FIRST/tflitemodels/PowerPlayV2.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
@@ -46,6 +45,12 @@ public class Parking extends LinearOpMode {
     public void runOpMode() {
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
+        robot.rotate(90, 0.5);
+        robot.rotate(-90, 0.5);
+        robot.rotateTo(90, 0.2);
+        robot.rotateTo(0, 0.2);
+        robot.rotateToAlso(90, 0.4);
+        robot.rotateToAlso(0, 0.4);
         initVuforia();
         initTfod();
         initialize();
@@ -118,33 +123,33 @@ public class Parking extends LinearOpMode {
             }
         }
         lclaw.setPosition(0);
-        robot.encoderDrive(0.7, 44.5, 'B');
-        robot.rotate(241, 0.6);//122, 134.9
+        robot.encoderDrive(0.7, 45.5, 'B');
+        robot.rotate(-220, 0.6);//122, 134.9
         openSesame.setPosition(1.0);
-        sleep(2000);
+        sleep(1000);
         lclaw.setPosition(0);
         lchain.setPosition(0.2);
         robot.ltrolley.setTargetPosition(robot.ltrolley.getCurrentPosition()+3165);
-        sleep(500);
         //lchain.setPosition(0.1);
-        sleep(500);
         robot.ltrolley.setPower(-0.7);
-        sleep(1000);
+        sleep(750);
         robot.ltrolley.setPower(0.0);
         robot.ltrolley.setPower(0.7);
-        sleep(2450);
+        //sleep(2450);
+        sleep(2000);
         robot.encoderDrive(0.7, 1, 'B');
         robot.ltrolley.setPower(0.0);
         openSesame.setPosition(0.0);
         lclaw.setPosition(0);
         lchain.setPosition(0.558); // 0.6
-        sleep(2900);
+        //sleep(2900);
+        sleep(1000);
         lclaw.setPosition(1);
-        sleep(500);
+        sleep(200);
         lchain.setPosition(0.2);
-        sleep(100);
-        robot.rotate(70, 0.7);
-        sleep(2000);
+        //sleep(500);
+        robot.rotate(-35, 0.5);
+        sleep(250);
         robot.encoderDrive(0.5, 9, 'B');
         if(coneNum==1) {
             robot.encoderDrive(0.5, 7, 'B');
@@ -156,6 +161,7 @@ public class Parking extends LinearOpMode {
             robot.encoderDrive(0.5, 28, 'R');
             robot.encoderDrive(0.5, 3, 'F');
         }
+
 
 /*
         //openSesame.setPosition(0.0);

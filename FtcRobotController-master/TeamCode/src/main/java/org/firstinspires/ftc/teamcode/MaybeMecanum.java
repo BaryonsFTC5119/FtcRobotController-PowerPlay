@@ -36,7 +36,7 @@ public class MaybeMecanum extends OpMode
     private Controller controller2;
     private boolean arcadeMode = false;
     private boolean slowMode = false;
-    Servo lclaw, lchain, openSesame;
+    Servo claw, lchain, openSesame;
 
 
     int Bcounter = 0;
@@ -51,9 +51,11 @@ public class MaybeMecanum extends OpMode
         controller = new Controller(gamepad1);
         controller2 = new Controller(gamepad2);
         lchain = hardwareMap.servo.get("lchain");
-        lclaw = hardwareMap.servo.get("lclaw");
+        claw = hardwareMap.servo.get("lclaw");
         openSesame = hardwareMap.servo.get("OS");
         lchain.scaleRange(0,0.6);
+        claw.scaleRange(0.5, 1.0);
+        claw.setPosition(0.5);
         robot.ltrolley.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODERS);
     }
 
@@ -113,6 +115,9 @@ public class MaybeMecanum extends OpMode
         if (controller.YOnce()) {
             slowMode = !slowMode;
         }
+        if (controller.BOnce()) {
+            robot.encoderRotate(90, 0.4);
+        }
 
         telemetry.addData("Arcade Mode (a)", arcadeMode ? "YES" : "no.");
         telemetry.addData("Slow Mode (s)", slowMode ? "YES" : "no.");
@@ -148,12 +153,12 @@ public class MaybeMecanum extends OpMode
         }
 
         if(controller2.left_trigger>0.2){
-            lclaw.setPosition(lclaw.getPosition()+0.1);
+            claw.setPosition(claw.getPosition()+0.1);
             state="end";
         }
 
         if(controller2.right_trigger>0.2){
-            lclaw.setPosition(lclaw.getPosition()-0.1);
+            claw.setPosition(claw.getPosition()-0.1);
             state="end";
         }
 
@@ -221,7 +226,7 @@ public class MaybeMecanum extends OpMode
         telemetry.addData("2 Left Joystick Y", controller2.left_stick_y);
         telemetry.addData("2 Left Joystick X", controller2.left_stick_x);
         telemetry.addData("Lchain wants to go to: ", lchain.getPosition());
-        telemetry.addData("Lclaw wants to go to:  ", lclaw.getPosition());
+        telemetry.addData("claw wants to go to:  ", claw.getPosition());
         telemetry.addData("Open sesame wants to go to: ", openSesame.getPosition());
         telemetry.addData("LTrolley position: ", robot.ltrolley.getCurrentPosition());
         telemetry.addData("Light power", robot.light.getPower());

@@ -607,22 +607,6 @@ public class RealRobot {
             telemetry.addData("Current position", lf.getCurrentPosition());
             telemetry.addData("Target position", lf.getTargetPosition());
             telemetry.addData("Heading", getHeadingDegrees());
-            if(getHeadingDegrees()>1||getHeadingDegrees()<-1){
-                preciseRotate(-1*getHeadingDegrees(), 0.3);
-                telemetry.addData("Uh oh", 1);
-                //set the power desired for the motors
-                lf.setPower(power*.7*(direction == 'R' || direction == 'F' ? 1.3 : 1));
-                rf.setPower(power*.7*(direction == 'R' || direction == 'F' ? 1.3 : 1));
-                lr.setPower(power*.7);
-                rr.setPower(power*.7);
-
-                // set the motors to RUN_TO_POSITION
-                lf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                lr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                rr.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            }
-
 
             telemetry.update();
         }
@@ -646,7 +630,7 @@ public class RealRobot {
 
         double distance = Math.abs(degrees)*degreeLength;
         // The distance you drive with one turn of the wheel is the circumference of the wheel
-        double circumference = 3.14*WHEEL_DIAMETER_INCHES;
+        double circumference = (28/14)*3.14*WHEEL_DIAMETER_INCHES;
 
         double rotationsNeeded = distance/circumference;
 
@@ -759,7 +743,12 @@ public class RealRobot {
      */
     public void rotate(double degrees, double power)
     {
-        double endHeading = getHeadingDegrees()-degrees;
+        //double endHeading = getHeadingDegrees()+degrees;
+        double endHeading = degrees - getHeadingDegrees();
+        if(endHeading<-180)
+            endHeading+=360;
+        else if(endHeading>180)
+            endHeading-=360;
         if(degrees > 0)
         {
             lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -809,6 +798,72 @@ public class RealRobot {
             rr.setPower(0);
         }
     }
+
+    public double convertHeading(double degrees) {
+        if(degrees < -180) return degrees + 360;
+        else if(degrees > 180) return degrees - 360;
+        else return degrees;
+    }
+
+    public void rotateTo(double degrees, double power)
+    {
+        double currHeading = convertHeading(getHeadingDegrees());
+        //double endHeading = getHeadingDegrees()+degrees;
+        double endHeading = convertHeading(degrees);
+
+        double diff = convertHeading(endHeading - currHeading);
+        if(diff > 0)
+        {
+            lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            lf.setPower(-0.25);
+            lr.setPower(-0.25);
+            rf.setPower(0.25);
+            rr.setPower(0.25);
+            do {
+                loop();
+                currHeading = convertHeading(getHeadingDegrees());
+                telemetry.addData("Heading", getHeadingDegrees());
+                telemetry.addData("Absolute", Math.abs(degrees));
+                telemetry.addData("Degrees", diff);
+                telemetry.update();
+
+            } while(Math.abs(currHeading-convertHeading(degrees)) > 4);
+            lf.setPower(0);
+            lr.setPower(0);
+            rf.setPower(0);
+            rr.setPower(0);
+        }
+        else if(diff < 0)
+        {
+            lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            lf.setPower(0.25);
+            lr.setPower(0.25);
+            rf.setPower(-0.25);
+            rr.setPower(-0.25);
+            do {
+                loop();
+                currHeading = convertHeading(getHeadingDegrees());
+                telemetry.addData("Heading", getHeadingDegrees());
+                telemetry.addData("Absolute", Math.abs(degrees));
+                telemetry.addData("Degrees", diff);
+                telemetry.update();
+
+            }while(Math.abs(currHeading-convertHeading(degrees)) > 4);
+            lf.setPower(0);
+            lr.setPower(0);
+            rf.setPower(0);
+            rr.setPower(0);
+        }
+    }
+
     public void preciseRotate(double degrees, double power)
     {
         double endHeading = getHeadingDegrees()-degrees;
@@ -862,12 +917,89 @@ public class RealRobot {
         }
     }
 
+    public void rotateToAlso(double ending, double power)
+    {
+        double starting = getHeadingDegrees();
+        if(360-max(starting,ending)+min(starting,ending)<180 && starting + ending > 180) {
+            if(ending>starting)
+                clockwise = false;
+            else
+                clockwise = true;
+        } else {
+            if(ending>starting)
+                clockwise = true;
+            else
+                clockwise = false;
+        }
+        if(!clockwise) //CCW
+        {
+            lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            lf.setPower(-power);
+            lr.setPower(-power);
+            rf.setPower(power);
+            rr.setPower(power);
+            do {
+                loop();
+                telemetry.addData("Heading", getHeadingDegrees());
+                telemetry.addData("Absolute", Math.abs(degrees-getHeadingDegrees()));
+                telemetry.addData("Degrees", degrees);
+                telemetry.update();
+
+            } while(Math.abs(getHeadingDegrees()-endHeading) > 4);
+            lf.setPower(0);
+            lr.setPower(0);
+            rf.setPower(0);
+            rr.setPower(0);
+        }
+        else //CW
+        {
+            lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            lf.setPower(power);
+            lr.setPower(power);
+            rf.setPower(-power);
+            rr.setPower(-power);
+            do {
+                loop();
+                telemetry.addData("Heading", getHeadingDegrees());
+                telemetry.addData("Absolute", Math.abs(degrees-getHeadingDegrees()));
+                telemetry.addData("Degrees", degrees);
+                telemetry.update();
+
+            }while(Math.abs(getHeadingDegrees()-endHeading) > 4);
+            lf.setPower(0);
+            lr.setPower(0);
+            rf.setPower(0);
+            rr.setPower(0);
+        }
+    }
+
     public void useEncoders()
     {
         lf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         lr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rf.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rr.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public double headingTo360(double heading) {
+        if(heading<0)
+            heading+=360;
+        return heading;
+    }
+
+    public double headingTo360() {
+        double heading = getHeadingDegrees();
+        if(heading<0)
+            heading+=360;
+        return heading;
     }
 
     /*public void outtake(int position)
